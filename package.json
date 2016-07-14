@@ -1,0 +1,26 @@
+{
+  "name": "ES6Fun",
+  "version": "0.0.1",
+  "description": "ES6 Function Demo",
+  "keywords" : "javascript, es6, demo",
+  "main": "",
+  "scripts": {
+    "build":"babel src -d dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015":"~6.9.0",
+    "babel-cli ":"~6.10.1",
+    "babel-plugin-transform-es2015-modules-umd": "^6.8.0",
+    "chai": "^3.5.0",
+    "karma": "^0.13.22",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-mocha": "^0.2.2",
+    "karma-mocha-reporter": "^2.0.0",
+    "mocha": "^2.4.5"
+  },
+  "author": "cuss",
+  "license": "MIT"
+}
