@@ -1,8 +1,10 @@
 module.exports = function(config) {
+    var nodePath = 'node_modules/babel-polyfill/dist/';
   config.set({
     basePath: '',
     frameworks: ['mocha', 'chai'],
     files: [
+        nodePath +'/polyfill.js',
       'src/**/*.js',
       'test/**/*.spec.js'
     ],
@@ -22,4 +24,4 @@ module.exports = function(config) {
     singleRun: false,
     concurrency: Infinity
   });
-}
+};
