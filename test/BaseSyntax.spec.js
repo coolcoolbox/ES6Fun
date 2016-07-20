@@ -3,6 +3,19 @@
  */
 import BaseSyntax from '../src/BaseSyntax'
 // BaseSyntax test
+//测试基本的语法
+//测试的范围
+/*
+ 1.定义变量以及对应的作用域
+ 2.解构和对应的默认值
+ 3.Generator函数 yield语句和*函数
+ 4.Iterator函数
+ 5.Thunk函数
+ 6.Class语法
+ 7.Decorator修饰器
+ 8.MixIn模式
+ 9.module方式
+ */
 describe('ES6 BaseSyntax Test', function() {
     let bs = new BaseSyntax();
     it('测试快级变量let,应该返回一个数组["let var error","let var error"]', function() {
@@ -32,5 +45,17 @@ describe('ES6 BaseSyntax Test', function() {
             obj = [{value: "hello", done: false},{value: "world", done: false},{value: "ending", done: true},{value: undefined, done: true}];
         expect(obj).to.deep.equal(methods._testYield());
         expect(4).not.equal(methods._testBase());
+        expect(['inner error','out error']).to.deep.equal(methods._testError().result);
+        expect([1,2,3,4,5]).to.deep.equal(methods._testArr());
     });
+
+    it('测试yield的特性', function() {
+        var methods = bs.testGenerator(),
+            result = methods._testParams(),
+            obj = [{value: 3, done: false},{value: NaN, done: false},{value: NaN, done: true}],
+            obj1 = [{value: 3, done: false},{value: 1, done: false},{value: 4, done: true}];
+        expect(obj).to.deep.equal(result.result);
+        expect(obj1).to.deep.equal(result.result1);
+    });
+
 });

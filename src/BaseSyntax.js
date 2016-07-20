@@ -6,14 +6,13 @@
  * @description : 基本语法测试 参考阮一峰es6入门教程
  *                  1.定义变量以及对应的作用域
  *                  2.解构和对应的默认值
- *                  3.yield语句和*函数
- *                  4.Generator函数
- *                  5.Iterator函数
- *                  6.Thunk函数
- *                  7.Class语法
- *                  8.Decorator修饰器
- *                  9.MixIn模式
- *                  10.module方式
+ *                  3.Generator函数 yield语句和*函数
+ *                  4.Iterator函数
+ *                  5.Thunk函数
+ *                  6.Class语法
+ *                  7.Decorator修饰器
+ *                  8.MixIn模式
+ *                  9.module方式
  *
  */
 export default class BaseSyntax {
@@ -36,12 +35,12 @@ export default class BaseSyntax {
     //
     testScope() {
         var arr = [1,2,3],result = [];
-        for(let i = 0,len = arr.length;i>len;i++){
+        for(let i = 0,len = arr.length;i<len;i++){
             var vaV = i;
             let leV = i;
         }
         try{
-            console.log(vaV); //访问块级作用域中的变量 能够访问
+            vaV = 5; //访问块级作用域中的变量 能够访问
         }catch (e){
             result.push('var var error');
         }
@@ -122,38 +121,119 @@ export default class BaseSyntax {
     //      其中每一个Generator都有一个done 属性 表示当前的状态是否已经完成 当函数执行完之后 这个值为true在此执行往返操作
     // 2.yield 表示暂缓 不能在普通函数中使用 会报语法错误
     // 3.对应的Iterator函数 在#部分
+    // 4.generator的捕获异常
+    // 5.generator中的return方法 直接走到末尾 带参数 表示返回的value (例外:函数中有finally return表示在finally之后执行)
+    // 6.generator中的generator 这个时候 generator必须带有* 否则是没有效果的
+    // 7. 快速操作 对拥有iterator接口的对象 可以快捷遍历该对象 对任何对象设置iterator接口
+    // 8. generator　中的this 指向当前的遍历对象
     testGenerator(){
         //下面的3个函数 依次返回 func1 func 2 func 3
 
-        //测试基础的使用
+        //测试基础的使用 可以作为暂缓函数  需要的时候在执行操作
         function _testBase(){
             function* __f1(){
                 return 3+1;
             }
             //生成generator函数 没有返回值
             return __f1();
-
         }
+        //测试基本的流程
         function _testYield(){
-            function* _f1(){
+            function* __f2(){
                 yield 'hello';
                 yield 'world';
                 return 'ending';
             }
-            let f1f = _f1(); //生成generator函数
+            let f2f = __f2(); //生成generator函数
             let result = [];
             //执行操作
 
-            result.push(f1f.next()); //{value: "hello", done: false}
-            result.push(f1f.next()); //{value: "world", done: false}
-            result.push(f1f.next()); //{value: "ending", done: true}
-            result.push(f1f.next()); //{value: undefined, done: true}
+            result.push(f2f.next()); //{value: "hello", done: false}
+            result.push(f2f.next()); //{value: "world", done: false}
+            result.push(f2f.next()); //{value: "ending", done: true}
+            result.push(f2f.next()); //{value: undefined, done: true}
+            return result;
+        }
+        //测试yield中的传参 和对应的返回值
+        function _testParams(){
+
+            function* __f3(num){
+                var y = yield num/2;
+                var x = yield y/3;
+                return x+y;
+            }
+            let result = [],result1 = [];
+            let f3f = __f3(6);
+
+            //执行 按照常规来想 应该是
+            result.push(f3f.next()); //{value: 3, done: false} 实际是 {value: 3, done: false}
+            result.push(f3f.next()); //{value: 1, done: false} 实际是 {value: NaN, done: false} 说明这里的返回的值 yield y/3 报错  y为undefined 为什么了 因为上一部yield解析完之后 指针在上一次的位置 这个时候执行next 没有任何的参数
+            result.push(f3f.next()); //{value: 4, done: true} 实际是 {value: NaN, done: true}
+
+            let f3f1 = __f3(6);
+            result1.push(f3f1.next()); //{value: 3, done: false} 实际是 {value: 3, done: false} 24 12  6
+            result1.push(f3f1.next(3)); //{value: 1, done: false} 实际是 {value: 1, done: false} 在这里执行的时候传递一个值进去 表示next上一次的指针位置  设置一个值为 3 则等于3 在继续往下走
+            result1.push(f3f1.next(1)); //{value: 4, done: true} 实际是 {value: 4, done: true} 走到这里设置上一次指针的位置的值为 1 则x为1 继续往下走 return 1+3
+
+            return {
+                result,result1
+            }
+        }
+
+        //异常捕获
+        function _testError(){
+            // 1.正常捕获 generator 该异常为 generator对象抛出
+            //      在内部捕获的时候当你执行的时候 如果指针没有走到最后 则捕获到该对象的异常 注意在内部捕获的时候 要注意快级作用域 当一个报错 try中的不会再次执行 如果没有try 直接走到函数末尾结束
+            //      如果指针没有走到最后，异常会被里面的内容捕获
+            //      推荐异常写在函数外部 generator不对异常做处理
+            function* __f41(arr){
+                try{
+                    yield 3;
+                }catch (e){
+                    arr.push(e);
+                }
+                return 1
+            }
+
+            var f41 ,result = [];
+            f41 = __f41(result);
+            f41.next();
+            try{
+                f41.throw('inner error');
+                f41.throw('out error');
+            }catch (e){
+                result.push(e);
+            }
+            return {
+                result
+            }
+        }
+
+        function _testArr(){
+            function* __f5(arr){
+                yield *arr;
+            }
+            var f51 = __f5([1,2,3,4,5]),result = [];
+            result.push(f51.next().value);
+            result.push(f51.next().value);
+            result.push(f51.next().value);
+            result.push(f51.next().value);
+            result.push(f51.next().value);
             return result;
         }
         return {
             _testBase:_testBase,
-            _testYield:_testYield
+            _testYield:_testYield,
+            _testParams:_testParams,
+            _testError:_testError,
+            _testArr:_testArr
         }
+    }
+
+    //测试遍历属性Iterator  这个表示这个对象是可以进行遍历的  只要实现了这个接口 就可以进行 所谓的 省略赋值 使用for of 方法进行遍历操作 原生的js对象不具备yield接口 可以使用generator添加接口 进行使用for of方法
+    //
+    testIterator(){
+
     }
 
 }
