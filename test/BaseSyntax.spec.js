@@ -58,4 +58,13 @@ describe('ES6 BaseSyntax Test', function() {
         expect(obj1).to.deep.equal(result.result1);
     });
 
+    it('测试iterator特性', function() {
+        var methods = bs.testIterator(),
+            result = methods.testBase(),
+            obj = [1,2,3],
+            obj1 = ['o','k',1,2];
+        expect(obj).to.deep.equal(result);
+        expect(obj1).to.deep.equal( methods.testInject());
+    });
+
 });

@@ -15,7 +15,8 @@
  *                  9.module方式
  *
  */
-export default class BaseSyntax {
+export default
+class BaseSyntax {
 
     //es6增加了两种定义 1:let 2: const
     /*
@@ -34,85 +35,88 @@ export default class BaseSyntax {
     //测试常量的修改
     //
     testScope() {
-        var arr = [1,2,3],result = [];
-        for(let i = 0,len = arr.length;i<len;i++){
+        var arr = [1, 2, 3], result = [];
+        for (let i = 0, len = arr.length; i < len; i++) {
             var vaV = i;
             let leV = i;
         }
-        try{
+        try {
             vaV = 5; //访问块级作用域中的变量 能够访问
-        }catch (e){
+        } catch (e) {
             result.push('var var error');
         }
-        try{
+        try {
             console.log(leV); //访问块级作用域中的变量 报错
-        }catch (e){
+        } catch (e) {
             result.push('let var error');
         }
-        try{
+        try {
             console.log(i); //访问块级作用域中的变量 报错
-        }catch (e){
+        } catch (e) {
             result.push('let var error');
         }
         return result;
     }
+
     //测试const  const 表示不能改变改元素的指向  比如一个元素数组 const a = []; 其中是可以对a进行读写的  const a = [];再次执行则不行
-    testChangeCOnst(){
+    testChangeCOnst() {
         var result;
         var vaV = 3;
         const ct = 3;
         // 编译错误 不能进行复制
-        try{
-          /*  ct = 5;  const vaV = 6;*/
+        try {
+            /*  ct = 5;  const vaV = 6;*/
             throw new Error('syntax error');
-        }catch (e){
+        } catch (e) {
             result = 'const error'
         }
         return result;
     }
+
     //解析测试  注意如果后面的值为undefined表示未定义则使用默认值 如果后面的是null 表示这个值为null则会使用null
     //解析字符串
-    testStringAnalysis(){
+    testStringAnalysis() {
         //解析对象
         //eg 1 简单的解析
-        var {a,b,v} = {a:1,b:2,v:3};
+        var {a,b,v} = {a: 1, b: 2, v: 3};
         //eg 2 未对应解析
         //对应的规则则是与后面的对象对应key -> 赋值val
-        var {a:a11,b:b11,v:v11} =  {a:1,b:2,v:3};
+        var {a: a11,b: b11,v: v11} =  {a: 1, b: 2, v: 3};
         // eg 4 对象解析的复杂情况
-        var {q=-1,w,e} =  {w:2,e:3};
+        var {q=-1,w,e} =  {w: 2, e: 3};
         // eg 4 对象的解析默认值
-       var {r=-1,t,y} =  {r:2,t:3,y:{h:'hello'}};
+        var {r=-1,t,y} =  {r: 2, t: 3, y: {h: 'hello'}};
         // eg 5 对象的解析解析值为undefined 和默认值为一个函数
         var {u=function () {
             return 1;
-        }(),i,o} =  {u:undefined,i:2,o:3};
+        }(),i,o} =  {u: undefined, i: 2, o: 3};
 
         // eg 6 解析对象的函数
-        var {length:p} = 'ok';
+        var {length: p} = 'ok';
         //返回一个对象{a:1,b:2,v:3,a11:1,b11:2,v11:3,q:-1,w:2,e:3,r:2,t:3,y:{h:"hello"},u:1,i:2,o:3,p:2}
         return {
-            a,b,v,a11,b11,v11,q,w,e,r,t,y,u,i,o,p
+            a, b, v, a11, b11, v11, q, w, e, r, t, y, u, i, o, p
         }
     }
+
     //解析数组 todo 原理实现了Iterator 接口的都可以进行解析 -> 暂且记住这个规则 后面在回顾
-    testArrayAnalysis(){
+    testArrayAnalysis() {
         //解析数组
         //eg 1 基本的解析
-        var [a,b,c] = [1,2,3];
+        var [a,b,c] = [1, 2, 3];
         //eg 2 解析合成
-        var [q,w,e,...r] = [1,2,3,4,5,6]
+        var [q,w,e,...r] = [1, 2, 3, 4, 5, 6];
         //eg 3 缺省数组的解析
-        var [t,,y] = [1,2,3];
+        var [t,,y] = [1, 2, 3];
         //eg 4 默认值的解析 后面如果是undefined则是前面的值
-        var [u=3,i] = [,2];
+        var [u=3,i] = [, 2];
         //eg 5 使用函数作为默认值的解析
         var [o,p = function () {
-           return 2;
+            return 2;
         }()] = [1];
         //返回对应的对象 {a:1,b:2,c:3,q:1,w:2,e:3,r:[4,5,6],t:1,y:3,u:3,i:2,o:1,p:2}
         return {
-            a,b,c,q,w,e,r,t,y,u,i,o,p
+            a, b, c, q, w, e, r, t, y, u, i, o, p
         }
     }
 
@@ -126,24 +130,27 @@ export default class BaseSyntax {
     // 6.generator中的generator 这个时候 generator必须带有* 否则是没有效果的
     // 7. 快速操作 对拥有iterator接口的对象 可以快捷遍历该对象 对任何对象设置iterator接口
     // 8. generator　中的this 指向当前的遍历对象
-    testGenerator(){
+    testGenerator() {
         //下面的3个函数 依次返回 func1 func 2 func 3
 
         //测试基础的使用 可以作为暂缓函数  需要的时候在执行操作
-        function _testBase(){
-            function* __f1(){
-                return 3+1;
+        function _testBase() {
+            function* __f1() {
+                return 3 + 1;
             }
+
             //生成generator函数 没有返回值
             return __f1();
         }
+
         //测试基本的流程
-        function _testYield(){
-            function* __f2(){
+        function _testYield() {
+            function* __f2() {
                 yield 'hello';
                 yield 'world';
                 return 'ending';
             }
+
             let f2f = __f2(); //生成generator函数
             let result = [];
             //执行操作
@@ -154,15 +161,17 @@ export default class BaseSyntax {
             result.push(f2f.next()); //{value: undefined, done: true}
             return result;
         }
-        //测试yield中的传参 和对应的返回值
-        function _testParams(){
 
-            function* __f3(num){
-                var y = yield num/2;
-                var x = yield y/3;
-                return x+y;
+        //测试yield中的传参 和对应的返回值
+        function _testParams() {
+
+            function* __f3(num) {
+                var y = yield num / 2;
+                var x = yield y / 3;
+                return x + y;
             }
-            let result = [],result1 = [];
+
+            let result = [], result1 = [];
             let f3f = __f3(6);
 
             //执行 按照常规来想 应该是
@@ -176,32 +185,32 @@ export default class BaseSyntax {
             result1.push(f3f1.next(1)); //{value: 4, done: true} 实际是 {value: 4, done: true} 走到这里设置上一次指针的位置的值为 1 则x为1 继续往下走 return 1+3
 
             return {
-                result,result1
+                result, result1
             }
         }
 
         //异常捕获
-        function _testError(){
+        function _testError() {
             // 1.正常捕获 generator 该异常为 generator对象抛出
             //      在内部捕获的时候当你执行的时候 如果指针没有走到最后 则捕获到该对象的异常 注意在内部捕获的时候 要注意快级作用域 当一个报错 try中的不会再次执行 如果没有try 直接走到函数末尾结束
             //      如果指针没有走到最后，异常会被里面的内容捕获
             //      推荐异常写在函数外部 generator不对异常做处理
-            function* __f41(arr){
-                try{
+            function* __f41(arr) {
+                try {
                     yield 3;
-                }catch (e){
+                } catch (e) {
                     arr.push(e);
                 }
                 return 1
             }
 
-            var f41 ,result = [];
+            var f41, result = [];
             f41 = __f41(result);
             f41.next();
-            try{
+            try {
                 f41.throw('inner error');
                 f41.throw('out error');
-            }catch (e){
+            } catch (e) {
                 result.push(e);
             }
             return {
@@ -209,11 +218,13 @@ export default class BaseSyntax {
             }
         }
 
-        function _testArr(){
-            function* __f5(arr){
+        //测试数组
+        function _testArr() {
+            function* __f5(arr) {
                 yield *arr;
             }
-            var f51 = __f5([1,2,3,4,5]),result = [];
+
+            var f51 = __f5([1, 2, 3, 4, 5]), result = [];
             result.push(f51.next().value);
             result.push(f51.next().value);
             result.push(f51.next().value);
@@ -221,22 +232,106 @@ export default class BaseSyntax {
             result.push(f51.next().value);
             return result;
         }
+
         return {
-            _testBase:_testBase,
-            _testYield:_testYield,
-            _testParams:_testParams,
-            _testError:_testError,
-            _testArr:_testArr
+            _testBase: _testBase,
+            _testYield: _testYield,
+            _testParams: _testParams,
+            _testError: _testError,
+            _testArr: _testArr
         }
     }
 
-    //测试遍历属性Iterator  这个表示这个对象是可以进行遍历的  只要实现了这个接口 就可以进行 所谓的 省略赋值 使用for of 方法进行遍历操作 原生的js对象不具备yield接口 可以使用generator添加接口 进行使用for of方法
+    //测试遍历属性Iterator  这个表示这个对象是可以进行遍历的  只要实现了这个接口 就可以进行 所谓的 省略赋值 使用for of 方法进行遍历操作 原生的js对象 可以使用generator添加接口 进行使用for of方法
     // 意义 1. 提供对应的数据结构  可以对其进行解析遍历 说白了就是说我有这样一个对象 实现了 我就能根据我根据这个结构写的方法进行操作
     //创建 -> 执行next - > 走带第一个数据结构 ->next -> 如果有其他的就走到其他的位置上去 否则return位置
     // 说白了就是说对象中有对应的next方法 就可以进行遍历操作 原生的实现了Symbol.iterator的属性也可以进行操作 因为他拥有对应的next方法
-    testIterator(){
+    // 在es6中 数组、某些类似数组的对象、set、map  具备 iterator接口  可以使用对应的 arr[Symbol.iterator]() 得到对应的iterator
+    // 对于伪数组 可以直接设置对象的 Symbol.iterator 接口等于数组的iterator 接口 即可
+    testIterator() {
 
         //1. 给
+
+        function testBase() {
+            //设置一个iterator函数
+            let re = [];
+            //这是一个函数 传入一个对象 返回对象的key value
+            class _iterator {
+                constructor(obj) {
+                    this.keys = Object.keys(obj);
+                    this.start = -1;
+                    this.obj = obj;
+                }
+
+            [Symbol.iterator]() {
+                return this;
+            }
+                next() {
+                    this.start++;
+                    if (this.start <this.keys.length) {
+                        return {
+                            done: false,
+                            value: this.obj[this.keys[this.start]]
+                        }
+                    } else {
+                        return {
+                            done: true,
+                            value: undefined
+                        }
+                    }
+                }
+            }
+
+            let it = new _iterator({
+                a: 1, b: 2, c: 3
+            });
+
+            for (let result of it) {
+                re.push(result);
+            }
+            return re;
+        }
+
+        function testInject(){ //默认的数组已经实现了对应的Symbol.iterator接口
+            var obj = 'ok',result = [],obj1 = {
+                a:1,b:2
+            };
+            obj1[Symbol.iterator] = function () {
+                var that = this,
+                    keys = Object.keys(that),
+                    length = keys.length,
+                    start = -1;
+                return {
+                    next: function () {
+                        //
+                        start ++;
+                        if(start < length){
+                            return {
+                                done:false,
+                                value:that[keys[start]]
+                            }
+                        }else{
+                            return {
+                                done:true,
+                                value:undefined
+                            }
+                        }
+                    }
+                }
+            }
+            for(let v of obj){
+                result.push(v);
+            }
+            for(let v of obj1){
+                result.push(v);
+            }
+            return result;
+        }
+        return {
+            testBase,
+            testInject
+        }
     }
 
+    //测试trunk函数 
 }
