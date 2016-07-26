@@ -16,6 +16,8 @@ module.exports = function(config) {
       'test/**/*.spec.js': ['babel']
     },
     reporters: ['mocha'],
+      browserDisconnectTimeout:15000,
+      browserNoActivityTimeout:"15000",
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

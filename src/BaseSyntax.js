@@ -15,8 +15,9 @@
  *                  9.module方式
  *
  */
-export default
-class BaseSyntax {
+
+
+export default class BaseSyntax {
 
     //es6增加了两种定义 1:let 2: const
     /*
@@ -334,7 +335,7 @@ class BaseSyntax {
     }
 
     //测试trunk函数 这一段需要了解 promise  对此测试了对应的promise对象
-    //trunk函数实现的意义
+    //trunk函数实现的意义 trunk函数就是为了实现所谓的传名调用 即使在需要的时候执行所谓的名 -> 通过函数的形式 在需要的时候计算 
 
     testTrunk(){
         //1.使用promise进行请求数据
