@@ -333,5 +333,13 @@ class BaseSyntax {
         }
     }
 
-    //测试trunk函数 
+    //测试trunk函数 这一段需要了解 promise  对此测试了对应的promise对象
+    //trunk函数实现的意义
+
+    testTrunk(){
+        //1.使用promise进行请求数据
+        function _testPromise(){
+
+        }
+    }
 }

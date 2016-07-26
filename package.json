@@ -6,7 +6,8 @@
   "main": "",
   "scripts": {
     "build":"babel src -d dist",
-    "test": "karma start  --require babel-polyfill"
+    "start":"node ./serve",
+    "test": " karma start  "
   },
   "devDependencies": {
     "babel-preset-es2015":"~6.9.0",
