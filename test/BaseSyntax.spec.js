@@ -45,15 +45,15 @@ describe('ES6 BaseSyntax Test', function() {
     it('测试generator语法,返回generator执行的结果', function() {
         var methods = bs.testGenerator(),
             obj = [{value: "hello", done: false},{value: "world", done: false},{value: "ending", done: true},{value: undefined, done: true}];
-        expect(obj).to.deep.equal(methods._testYield());
-        expect(4).not.equal(methods._testBase());
-        expect(['inner error','out error']).to.deep.equal(methods._testError().result);
-        expect([1,2,3,4,5]).to.deep.equal(methods._testArr());
+        expect(obj).to.deep.equal(methods.testYield());
+        expect(4).not.equal(methods.testBase());
+        expect(['inner error','out error']).to.deep.equal(methods.testError().result);
+        expect([1,2,3,4,5]).to.deep.equal(methods.testArr());
     });
 
     it('测试yield的特性', function() {
         var methods = bs.testGenerator(),
-            result = methods._testParams(),
+            result = methods.testParams(),
             obj = [{value: 3, done: false},{value: NaN, done: false},{value: NaN, done: true}],
             obj1 = [{value: 3, done: false},{value: 1, done: false},{value: 4, done: true}];
         expect(obj).to.deep.equal(result.result);
@@ -69,5 +69,30 @@ describe('ES6 BaseSyntax Test', function() {
         expect(obj1).to.deep.equal( methods.testInject());
     });
 
+    it('测试trunk函数', function() {
+        var methods = bs.testTrunk(),
+            result = methods.testPromise(),
+            result1 = methods.testProcess(),
+            obj = 8,
+            obj1 = [4,16,16];
+        expect(obj).equal(result);
+        expect(result1).to.deep.equal(obj1);
+    });
+
+    //暂时不测试es7语法
+ /*   it('测试async函数', function() {
+        var methods = bs.testAsync();
+    });*/
+
+    it('测试Class语法', function() {
+        var methods = bs.testClass(),
+            result = methods.testBaseClass(),
+            result1 = methods.testPrototype(),
+            obj = 'Base Class';
+
+        expect(result).equal(obj);
+        expect(result1).to.deep.equal({keys:[],prots:['constructor','toString']});
+
+    });
 });
 

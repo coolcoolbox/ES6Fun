@@ -5,6 +5,7 @@ module.exports = function(config) {
     frameworks: ['mocha', 'chai'],
     files: [
         nodePath +'/polyfill.js',
+        'src/pile/*.js',//加载桩程序
       'src/**/*.js',
       'test/**/*.spec.js'
     ],
@@ -20,7 +21,7 @@ module.exports = function(config) {
       browserNoActivityTimeout:"15000",
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_WARN,
     autoWatch: true,
     browsers: ['Chrome'],
     singleRun: false,

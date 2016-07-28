@@ -15,8 +15,7 @@
  以上的状态一经变化就不能更改
  注意的是 promise无法取消 并且promise需要设置回调来捕获异常
  */
-export default
-class PromiseObject {
+export default class PromiseObject {
     //基本调用测试
     testBase(utils) {
         //创建promise对象  返回对应的promise对象

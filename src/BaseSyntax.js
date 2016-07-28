@@ -16,6 +16,7 @@
  *
  */
 
+import Base from './pile/Base.js';
 
 export default class BaseSyntax {
 
@@ -47,12 +48,12 @@ export default class BaseSyntax {
             result.push('var var error');
         }
         try {
-            console.log(leV); //访问块级作用域中的变量 报错
+            leV = 5; //访问块级作用域中的变量 报错
         } catch (e) {
             result.push('let var error');
         }
         try {
-            console.log(i); //访问块级作用域中的变量 报错
+            i = 5; //访问块级作用域中的变量 报错
         } catch (e) {
             result.push('let var error');
         }
@@ -135,24 +136,24 @@ export default class BaseSyntax {
         //下面的3个函数 依次返回 func1 func 2 func 3
 
         //测试基础的使用 可以作为暂缓函数  需要的时候在执行操作
-        function _testBase() {
-            function* __f1() {
+        function testBase() {
+            function* _f1() {
                 return 3 + 1;
             }
 
             //生成generator函数 没有返回值
-            return __f1();
+            return _f1();
         }
 
         //测试基本的流程
-        function _testYield() {
-            function* __f2() {
+        function testYield() {
+            function* _f2() {
                 yield 'hello';
                 yield 'world';
                 return 'ending';
             }
 
-            let f2f = __f2(); //生成generator函数
+            let f2f = _f2(); //生成generator函数
             let result = [];
             //执行操作
 
@@ -164,23 +165,23 @@ export default class BaseSyntax {
         }
 
         //测试yield中的传参 和对应的返回值
-        function _testParams() {
+        function testParams() {
 
-            function* __f3(num) {
+            function* _f3(num) {
                 var y = yield num / 2;
                 var x = yield y / 3;
                 return x + y;
             }
 
             let result = [], result1 = [];
-            let f3f = __f3(6);
+            let f3f = _f3(6);
 
             //执行 按照常规来想 应该是
             result.push(f3f.next()); //{value: 3, done: false} 实际是 {value: 3, done: false}
             result.push(f3f.next()); //{value: 1, done: false} 实际是 {value: NaN, done: false} 说明这里的返回的值 yield y/3 报错  y为undefined 为什么了 因为上一部yield解析完之后 指针在上一次的位置 这个时候执行next 没有任何的参数
             result.push(f3f.next()); //{value: 4, done: true} 实际是 {value: NaN, done: true}
 
-            let f3f1 = __f3(6);
+            let f3f1 = _f3(6);
             result1.push(f3f1.next()); //{value: 3, done: false} 实际是 {value: 3, done: false} 24 12  6
             result1.push(f3f1.next(3)); //{value: 1, done: false} 实际是 {value: 1, done: false} 在这里执行的时候传递一个值进去 表示next上一次的指针位置  设置一个值为 3 则等于3 在继续往下走
             result1.push(f3f1.next(1)); //{value: 4, done: true} 实际是 {value: 4, done: true} 走到这里设置上一次指针的位置的值为 1 则x为1 继续往下走 return 1+3
@@ -191,12 +192,12 @@ export default class BaseSyntax {
         }
 
         //异常捕获
-        function _testError() {
+        function testError() {
             // 1.正常捕获 generator 该异常为 generator对象抛出
             //      在内部捕获的时候当你执行的时候 如果指针没有走到最后 则捕获到该对象的异常 注意在内部捕获的时候 要注意快级作用域 当一个报错 try中的不会再次执行 如果没有try 直接走到函数末尾结束
             //      如果指针没有走到最后，异常会被里面的内容捕获
             //      推荐异常写在函数外部 generator不对异常做处理
-            function* __f41(arr) {
+            function* _f41(arr) {
                 try {
                     yield 3;
                 } catch (e) {
@@ -206,7 +207,7 @@ export default class BaseSyntax {
             }
 
             var f41, result = [];
-            f41 = __f41(result);
+            f41 = _f41(result);
             f41.next();
             try {
                 f41.throw('inner error');
@@ -220,12 +221,12 @@ export default class BaseSyntax {
         }
 
         //测试数组
-        function _testArr() {
-            function* __f5(arr) {
+        function testArr() {
+            function* _f5(arr) {
                 yield *arr;
             }
 
-            var f51 = __f5([1, 2, 3, 4, 5]), result = [];
+            var f51 = _f5([1, 2, 3, 4, 5]), result = [];
             result.push(f51.next().value);
             result.push(f51.next().value);
             result.push(f51.next().value);
@@ -235,11 +236,7 @@ export default class BaseSyntax {
         }
 
         return {
-            _testBase: _testBase,
-            _testYield: _testYield,
-            _testParams: _testParams,
-            _testError: _testError,
-            _testArr: _testArr
+            testBase,testYield,testParams,testError,testArr
         }
     }
 
@@ -297,6 +294,7 @@ export default class BaseSyntax {
             var obj = 'ok',result = [],obj1 = {
                 a:1,b:2
             };
+            //设置对象的iterator借口
             obj1[Symbol.iterator] = function () {
                 var that = this,
                     keys = Object.keys(that),
@@ -319,7 +317,7 @@ export default class BaseSyntax {
                         }
                     }
                 }
-            }
+            };
             for(let v of obj){
                 result.push(v);
             }
@@ -336,11 +334,146 @@ export default class BaseSyntax {
 
     //测试trunk函数 这一段需要了解 promise  对此测试了对应的promise对象
     //trunk函数实现的意义 trunk函数就是为了实现所谓的传名调用 即使在需要的时候执行所谓的名 -> 通过函数的形式 在需要的时候计算 
-
+    //可以对改造函数为trunk进行自动化自行 即使 写成trunk的形式 生成对应的generator函数 执行 ->next
+    //为此es7中提出了async函数 这个就是语法糖  async ()=>{} 即使对应的generator函数  await替代了 yield  不过他可以自动执行 并且这个函数返回对应的promise对象即使在 async中处理完成之后 return值为resolve
+    // 在async函数中 只要有一个出错 则会中断这个函数
     testTrunk(){
         //1.使用promise进行请求数据
-        function _testPromise(){
+        function testPromise(){
+            //设置 trunk函数
+            //传入 fn函数和参数 需要的时候才执行
+            function _trunk(fn){
+                //首先返回一个函数为执行 保存对应的状态
+                return function (...args) {
+                    return function (callback) {
+                        return fn.call(this,...args,callback);
+                    };
 
+                }
+            }
+            //调用
+
+            let add = _trunk(function (a,b) {
+                return a+b;
+            });
+            return add(3,5)();
+        }
+
+        //测试流程管理
+        function testProcess(){
+            //首先可以对流程做相应的管理 ->生成 generator函数
+            let result = [];
+            function *gen(x){
+                let y = yield  x*2;
+                let z =  yield  y*y;
+                return z;
+            }
+
+            function run(fn,...args){
+                let gen = fn(args);
+                //然后就开始执行函数
+
+                function next(err,data){
+                    var r = gen.next(data);
+                    result.push(r.value);
+                    //如果执行完毕 则返回r
+                    if(r.done || err) return r;
+                    //否则自动执行
+                    next(null,r.value);
+                }
+                next();
+            }
+            //执行
+            run(gen,2);
+            return result;
+        }
+
+        return {
+            testPromise,testProcess
+        }
+    }
+    //开始测试async
+    //todo 暂时不测试async es7语法
+    testAsync(){
+        //对应的Promise对象 通过 Utils取得
+        //测试基础用法
+        function testBaseAsync(){
+     /*       let arrF = async function (x){
+                let y = await x*2;
+                let z = await y*y;
+                return z;
+            }
+            //执行
+            arrF()*/
+            return 3;
+        }
+
+        //测试自动执行
+
+        function testAutoAsync(){
+
+        }
+
+        return {
+            testBaseAsync,testAutoAsync
+        }
+
+    }
+
+    //测试Class语法
+    // es6引入class 语法 目测是为了照顾传统程序员 ,提供一个语法糖来创建类 typeof 返回 function  并且他的prototype的constructor与此相等
+    // 区别: 1.  class 中所有的方法都在起对用的prototype中 所以集成的话 就比较合理
+    // 具体写法为
+    /*
+        eg. 1.声明一个类
+
+        class Base {
+
+            //构造函数 和传统的java语法类似 拥有super
+            constructor(){
+
+            }
+        }
+     */
+    testClass(){
+
+        //测试基本的class用法
+        //包含构造函数  重写
+        function testBaseClass(){
+
+            let base = new Base(1,'Base');
+            return base.toString();
+        }
+
+        //测试对应的class是否所有的方法都在prototype中
+        function testPrototype(){
+
+            let keys = Object.keys(Base.prototype), //发现 keys上并没有对应的值  说明在此原型链上
+                prots = Object.getOwnPropertyNames(Base.prototype);
+
+            return {
+                keys,prots
+            }
+
+        }
+
+        //测试es6的prototype  和es5中的prototype的区别
+
+        function testESDeliver(){
+            let base = new Base(1,'Base');
+
+            function Base1(){
+
+            }
+            Base1.prototype = {
+                constructor:Base1,
+                toString: function () {
+                    return 'Base1 Class';
+                }
+            }
+        }
+        return {
+            testBaseClass,testPrototype
         }
     }
 }
