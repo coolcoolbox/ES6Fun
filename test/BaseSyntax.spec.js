@@ -63,7 +63,7 @@ describe('ES6 BaseSyntax Test', function() {
     it('测试iterator特性', function() {
         var methods = bs.testIterator(),
             result = methods.testBase(),
-            obj = [1,2,3],
+            obj = [1,2,3,1,2,3],
             obj1 = ['o','k',1,2];
         expect(obj).to.deep.equal(result);
         expect(obj1).to.deep.equal( methods.testInject());
@@ -92,6 +92,10 @@ describe('ES6 BaseSyntax Test', function() {
 
         expect(result).equal(obj);
         expect(result1).to.deep.equal({keys:[],prots:['constructor','toString']});
+        expect(methods.testESDeliver()).to.deep.equal([true,true,true]);
+        expect(methods.testVarUp()).to.deep.equal(0);
+        expect(methods.testPrivate()).to.deep.equal(0);
+        expect(methods.testExtend()).to.deep.equal( {aSum:3,bSum:3});
 
     });
 });

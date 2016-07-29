@@ -69,6 +69,7 @@ describe('ES6 PromiseObject Test', function () {
 
     it('测试Promise.all', function (done) {
         let promiseAll =  promiseObject.testPromiseAll();
+        //所有的执行完 才会返回状态
         return promiseAll.then(data=>{
             expect(data).to.deep.equal([1,2,3]);
         }).then(()=>{
@@ -80,7 +81,7 @@ describe('ES6 PromiseObject Test', function () {
 
     it('测试Promise.race', function (done) {
         let promiseRace =  promiseObject.testPromiseRace();
-        //这里测试报错 如果报错则说明测试正常
+        //执行完一个则返回状态
         return promiseRace.then(data=>{
             expect(data).equal(1);
         }).then(()=>{
@@ -92,7 +93,7 @@ describe('ES6 PromiseObject Test', function () {
 
     it('测试Promise.resolve', function (done) {
         let promiseRace =  promiseObject.testInitPromise();
-        //这里测试报错 如果报错则说明测试正常
+        //调用resolve 把一个对象转换成promise对象
         return promiseRace.then(data=>{
             expect(data).equal(12);
         }).then(()=>{

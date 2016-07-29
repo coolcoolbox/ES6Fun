@@ -260,10 +260,10 @@ export default class BaseSyntax {
                     this.start = -1;
                     this.obj = obj;
                 }
-
-            [Symbol.iterator]() {
-                return this;
-            }
+                //部署这个借口 这个for of 的时候 调用这个 返回本对象 调用本对象的 next方法进行操作 也可以采用第二种方式  直接 *[Symbol.iterator]() 直接部署generator函数
+                [Symbol.iterator]() {
+                    return this;
+                }
                 next() {
                     this.start++;
                     if (this.start <this.keys.length) {
@@ -280,11 +280,31 @@ export default class BaseSyntax {
                 }
             }
 
+            class _iterator1 {
+                constructor(obj) {
+                    this.keys = Object.keys(obj);
+                    this.start = 0;
+                    this.obj = obj;
+                }
+                //部署这个借口 这个for of 的时候 调用这个 返回本对象 调用本对象的 next方法进行操作 也可以采用第二种方式  直接 *[Symbol.iterator]() 直接部署generator函数
+            *[Symbol.iterator]() {
+                for(;this.start <this.keys.length;this.start++){
+                    yield  this.obj[this.keys[this.start]]
+                }
+            }
+
+            }
+
             let it = new _iterator({
                 a: 1, b: 2, c: 3
             });
-
+            let it1 = new _iterator1({
+                a: 1, b: 2, c: 3
+            });
             for (let result of it) {
+                re.push(result);
+            }
+            for (let result of it1) {
                 re.push(result);
             }
             return re;
@@ -423,6 +443,10 @@ export default class BaseSyntax {
     //测试Class语法
     // es6引入class 语法 目测是为了照顾传统程序员 ,提供一个语法糖来创建类 typeof 返回 function  并且他的prototype的constructor与此相等
     // 区别: 1.  class 中所有的方法都在起对用的prototype中 所以集成的话 就比较合理
+    //       2.es6中的class不会变量提升
+    //       3.es6中可以通过Symbol 写出私有方法
+    //       4.在子类中 需要使用 super() 调用父类的构造方法 才能使用this 原因就是子类其实就是父元素生成之后 在对父元素进行处理 生成了子类 如果父元素没有进行加工 则不能使用this 因为this不存在 如果子类中不写constructor的话 会默认执行  Fun:constructor:super(...args);
+    //       5. es6 中可以集成原生数据结构 比如 Array String等
     // 具体写法为
     /*
         eg. 1.声明一个类
@@ -458,22 +482,175 @@ export default class BaseSyntax {
         }
 
         //测试es6的prototype  和es5中的prototype的区别
-
         function testESDeliver(){
-            let base = new Base(1,'Base');
+            //首先是基本的es5中的集成
+            //1.定义一个A
+            function A(){
+                this.name = 'A';
+                this.getName = function () {
+                    return this.name;
+                }
+            }
 
-            function Base1(){
+            //定义一个B 继承A
+            //传统的写法
+            function B(){
+                this.name = "B";
+            }
+
+            B.prototype = new A();
+            B.prototype.constructor = B;
+
+            //测试第一个
+            let a = new A(),
+                b = new B();
+            //测试es6中的类
+            //1.定义一个基础类
+            //2.集成Base
+            class C extends Base{
+                constructor(){
+                    //调用父元素的构造器
+                    super();
+                    this.name = 'C';
+                }
+                getName(){
+                    return this.name;
+                }
+            }
+
+            let base = new Base(1,'Base'),
+                c = new C();
+
+            //测试对应生成对象的constructor
+            let   resultES6 = [];
+            //首先 在es5 中 对象的原型链中的constructor应该指向改类型
+            //      实例对象 的__proto__ 即使该对象的原型 指向 该类型的prototype
+            /*      构造函数 ----->prototype ----- >  原型对象 （<----------- constructor)   //主要展示在原型对象上
+                      |                                 |
+                      |                                 |
+                    constructor                         |
+                      实列 ----------> __proto__-------->
+            */
+
+
+            /*  在es6中的集成 首先每一个class 都有对应的原型对象  然后每一个原型对象指向对应的类型
+                               然后在子类中 和 es5不一样的是子类的__proto__指向父类型 子类的prototype中的__proto__ 指向父类型的原型对象
+
+                        父类 ----->prototype--->父亲的原型对象 （<----------- constructor)
+                        |                               |
+                        |                               |
+                        |                               |
+                        __proto__                 __proto__
+                        子类--------->prototype--->子类的原型对象
+                        |                               |
+                        |                               |
+                        |                               |
+                        constructor                     |
+                        实列----------------------> __proto__
+
+             */
+            //1.首先测试es6中不同的 子类的__proto__ 是否指向父类  子类的原型中的__proto__是否指向父亲原型对象
+            // c 为实列 c的__proto__ 指向  子类的原型对象
+
+            resultES6.push(C.__proto__ == Base); // 子类的___proto__指向父对象
+            resultES6.push(c.__proto__ == C.prototype); // c 为实列 c的__proto__ 指向  子类的原型对象
+            resultES6.push(c.__proto__.__proto__ == Base.prototype); //集成之后的子类C的原型对象的__proto__ 指向父元素 的原型对象
+            return resultES6;
+        }
+
+        //测试变量提升
+
+        function testVarUp(){
+            let result = -1;
+            try{
+                let a = new A();
+                class A{
+
+                }
+            }catch (e){
+                result = 0;
 
             }
-            Base1.prototype = {
-                constructor:Base1,
-                toString: function () {
-                    return 'Base1 Class';
+
+            return result;
+
+        }
+
+        //测试私有方法
+        function testPrivate(){
+            let getName =  Symbol('getName');
+            class A{
+                [getName](name){
+                    return name;
+                }
+            }
+
+            let a = new A(),result = -1;
+            //访问私有方法报错 在内部可以进行调用
+            try{
+                a.getName();
+            }catch (e){
+                result = 0
+            }
+            return result;
+        }
+
+        //测试继承
+        function testExtend(){
+
+            class A{
+                constructor(x,y){
+                    this.x = x;
+                    this.y = y;
+                }
+                add(){
+                    return this.x + this.y
+                }
+            }
+
+            class B extends A{
+                constructor(x,y){
+                    super(x,y);
+                    this.total = x + y;
+                }
+
+                sum(){
+                    return this.total;
+                }
+            }
+            //编译报错 提示 'this' is not allowed before super() 说明使用this时候必须调用父元素的 super 并且super.xxx 可以调用父元素的方法
+       /*     class C extends A{
+                constructor(x,y){
+                    this.total = x + y;
+                }
+                sum(){
+                    return this.total;
+                }
+            }*/
+/*
+            let a = new A(1,2),
+                b = new B(1,2),
+                c = new C(1,2);
+
+            return {aSum:a.add(),bSum:b.sum(),cSum:c.sum()}*/
+
+            let a = new A(1,2),
+                b = new B(1,2);
+
+            return {aSum:a.add(),bSum:b.sum()}
+        }
+        //测试静态方法
+        function testStatic(){
+
+            class A{
+
+                static name(){
+                    return 'A';
                 }
             }
         }
         return {
-            testBaseClass,testPrototype
+            testBaseClass,testPrototype,testESDeliver,testVarUp,testPrivate,testExtend,testStatic
         }
     }
 }
