@@ -96,7 +96,20 @@ describe('ES6 BaseSyntax Test', function() {
         expect(methods.testVarUp()).to.deep.equal(0);
         expect(methods.testPrivate()).to.deep.equal(0);
         expect(methods.testExtend()).to.deep.equal( {aSum:3,bSum:3});
+        expect(methods.testStatic()).to.deep.equal( ['A',50,'A',30,'AB']);
+    });
 
+    //测试mixin的使用
+    it('测试MixIn', function() {
+        var result = bs.testMixIn(),
+            expec = ['A','B','C'];
+        expect(result).to.deep.equal(expec);
+    });
+    //测试module的特性
+    it('测试module的特性', function() {
+        var result = bs.testModule(),
+            expec = {name:'cuss',age:10,getName:'zh',defaultName:'name:cuss;age:10'};
+        expect(result).to.deep.equal(expec);
     });
 });
 

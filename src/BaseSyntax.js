@@ -17,7 +17,8 @@
  */
 
 import Base from './pile/Base.js';
-
+import {name,age,gName} from './pile/ExportPile';//引入属性
+import expName from './pile/ExportPile';//引入默认值 这个属性名可以自取
 export default class BaseSyntax {
 
     //es6增加了两种定义 1:let 2: const
@@ -640,17 +641,106 @@ export default class BaseSyntax {
             return {aSum:a.add(),bSum:b.sum()}
         }
         //测试静态方法
+        //静态方式测试出
         function testStatic(){
-
+            let result = [];
             class A{
-
-                static name(){
+                constructor(){
+                    this.proto = 50;
+                }
+                static ok(){
                     return 'A';
                 }
             }
+
+            class B extends A{
+                constructor(args){
+                    super(args);
+                    this.proto = 30;
+                }
+                static ok1(){
+                    return super.ok() + 'B';
+                }
+            }
+            let a = new A(),
+                b = new B();
+            result.push(A.ok());//调用对应的静态函数
+            result.push(a.proto);//使用es6的新的写法操作this
+            result.push(B.ok());//
+            result.push(b.proto);//
+            result.push(B.ok1());//
+            return result;
         }
         return {
             testBaseClass,testPrototype,testESDeliver,testVarUp,testPrivate,testExtend,testStatic
+        }
+    }
+
+    //开始测试mixin
+    testMixIn(){
+        //把多个class合成到一个class当中
+        function mix(...mixins){
+            class Mix{}
+            //遍历所有的参数 把对应的复制到Mixin中
+            for(let mixin of mixins){
+                _copyProperties(Mix,mixin);
+                _copyProperties(Mix.prototype,mixin.prototype);
+            }
+            return Mix;
+
+            function  _copyProperties(target,source){
+                for(let key of Reflect.ownKeys(source)){
+                    if(key !== 'constructor' &&key !== 'prototype'&&key !== 'name'){
+                        let desc = Object.getOwnPropertyDescriptor(source,key);
+                        Object.defineProperty(target,key,desc);
+                    }
+                }
+            }
+        }
+        class A{
+            getA(){
+                return 'A'
+            }
+        }
+
+        class B {
+            getB(){
+                return 'B';
+            }
+        }
+        class C extends mix(A,B){
+            getC(){
+                return 'C';
+            }
+        }
+        let  result = [];
+        let c = new C();
+        result.push(c.getA(),c.getB(),c.getC());
+        return result;
+    }
+
+    //todo es7语法 暂时不测试
+    testDecorator(){
+
+    }
+
+    //测试module
+    //为了弥补在模块化的需求  增加了对应的import来引入对应的模块
+    //在没有对应的标准之前 市面上有 amd 和cmd 规范 前者用于浏览器  后者用于服务器
+    // es6的引用和传统的cmd的区别就是 传统的是在执行前就进编译 而es6是动态编译的 cmd值保存的值的拷贝 es6是指的引用 
+    //cmd的循环加载的方式为  在执行到需要加载的对象的时候 找到该对象 进行执行 如果该对象有对应的引用 执行引用的结果 这个时候  当前的状态还没有执行完  如果另外一个对象在某一个点引用了初始对象 则引用到的初始的对象是没有执行完的结果
+    //在es6中的加载方式  由于是动态的引用  比如在初始类型中 引用了一个 b 在b中又引用了a  运行过程是这样的  当a中引用b的时候 执行b  b中遇到引用a的时候执行 由于a已经开始执行 则继续执行下去 执行完之后再继续执行a中的类容
+    //所以说安全的写法就是引用一个对象不引用其中某一个对象的值 比如 : require('http') noy require('http').xxx 因为xxx可能在某一个点的时候被别人所改变 导致结果出现问题
+    //export 表示该模块导出的属性 import 引入的属性 并且import拥有提升特性
+    //如果import的模块不export任何值 表示这个模块只是一个运行的模块(比如加载框架 或者做一些处理操作)
+    //如果导出的属性过多 可以使用对应的*来简略的表达出所有的类型 这里不包括 default的属性
+    //可以使用默认的导出 export default表示默认导出这个属性　这种情况的引入　可以直接饮用import Bse from './DefaultType'
+    testModule(){
+        let defaultName = expName(),
+            getName = gName();
+
+        return {
+            name,age,getName,defaultName
         }
     }
 }
