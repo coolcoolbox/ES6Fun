@@ -36,4 +36,9 @@ describe('ES6 SetObject Test', function () {
         }).to.deep.equal(result);
     })
 
+    it('测试weakSet', function () {
+        let result = setObject.testWeakSet();
+        expect([true,false]).to.deep.equal(result);
+    })
+
 });

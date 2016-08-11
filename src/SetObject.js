@@ -72,5 +72,18 @@ export default class SetObject {
             result1,result2,result3
         }
     }
+    //es6中嗨啊拥有一个weakSet的类型 这个类型只能引用对象，并且该对象被销毁的时候 不会参考weakSet中的引用 即使这个set中的数据也会被删除
+    //他拥有对应的  add   has  delete方法   不能进行遍历操作
 
+    testWeakSet(){
+        let ws = new WeakSet();
+        let o = {x:1},result = [];
+        ws.add(o);
+        result.push( ws.has(o));
+        ws.delete(o);
+        result.push( ws.has(o));
+
+        return result;
+
+    }
 }
