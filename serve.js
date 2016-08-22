@@ -10,7 +10,7 @@ exports.start = function() {
 
     var server = http.createServer(function (req, res) {
       
-        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Origin', '*');
         var pathname = __dirname + url.parse(req.url).pathname;
         if(path.extname(pathname) == "") {
             pathname += "/";

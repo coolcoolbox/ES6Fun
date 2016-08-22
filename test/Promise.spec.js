@@ -82,6 +82,7 @@ describe('ES6 PromiseObject Test', function () {
     it('测试Promise.race', function (done) {
         let promiseRace =  promiseObject.testPromiseRace();
         //执行完一个则返回状态
+        //aaa().then(resolve,reject)  // reject   catch  捕获promise的错误
         return promiseRace.then(data=>{
             expect(data).equal(1);
         }).then(()=>{
