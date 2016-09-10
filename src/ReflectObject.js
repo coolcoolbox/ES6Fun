@@ -44,6 +44,7 @@ export default  class ReflectObject{
         function a(){
             return this.name;
         }
-       return  Reflect.apply(a,{name:'cuss'},null);
+        //代理的函数  this对象 当前的参数
+       return  Reflect.apply(a,{name:'cuss'},[]);
     }
 }
